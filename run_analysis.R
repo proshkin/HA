@@ -1,19 +1,25 @@
 #load necessary libraries
 library(data.table)
-#setwd("./HAR")
-download.file("https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip", zip_file)
 
+#clear all variables
+rm(list=ls())
+
+zip_file = "HAR_dataset.zip"
+download.file("https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip", zip_file)
+unzip(zip_file)
 # file names and paths
-f_features <- "features.txt"
-f_activity <- "activity_labels.txt"
+f_features <- "./UCI HAR Dataset/features.txt"
+f_activity <- "./UCI HAR Dataset/activity_labels.txt"
 
-f_test_x_name <- "./test/X_test.txt"
-f_test_y_name <- "./test/y_test.txt"
-f_test_subj <- "./test/subject_test.txt"
+f_test_x_name <- "./UCI HAR Dataset/test/X_test.txt"
+f_test_y_name <- "./UCI HAR Dataset/test/y_test.txt"
+f_test_subj <- "./UCI HAR Dataset/test/subject_test.txt"
 
-f_train_x_name <- "./train/X_train.txt"
-f_train_y_name <- "./train/y_train.txt"
-f_train_subj <- "./train/subject_train.txt"
+f_train_x_name <- "./UCI HAR Dataset/train/X_train.txt"
+f_train_y_name <- "./UCI HAR Dataset/train/y_train.txt"
+f_train_subj <- "./UCI HAR Dataset/train/subject_train.txt"
+
+f_tidy_data <- "tidy_data.txt"
 
 #load test data
 x_t <- read.table(f_test_x_name)
@@ -43,7 +49,7 @@ x_std_mean <- x[,g_mean_std]
 #join y with activity 
 y_activity <- merge(y, activity)[,2]
 
-# add subject column
+#add subject column and activity name column
 x_act_subj <- cbind(subj, y_activity, x_std_mean)
 
 # assign column names
@@ -59,5 +65,5 @@ setnames(x_act_subj_dt,col_names)
 #calculate mean,  group by Subject, Activity
 avgDT <- x_act_subj_dt[, lapply(.SD,mean), by=c("Subject","Activity")]
 
-#convert to data frame
-avgDF <- data.frame(avgDT)
+#save tidy data to CSV file
+write.table(avgDT, file=f_tidy_data, sep=",", row.names=FALSE)
